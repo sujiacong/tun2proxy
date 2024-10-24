@@ -568,9 +568,10 @@ async fn handle_udp_gateway_session(
                             break;
                         }
                         UdpGwResponse::Data(data) => {
+                            use socks5_impl::protocol::StreamOperation;
                             let len = data.len();
                             log::debug!("[UdpGw] {} <- {} receive len {}", &tcp_local_addr, udp_dst, len);
-                            if let Err(e) = UdpGwClient::send_udp_packet(data, &mut udp_stack).await {
+                            if let Err(e) = udp_stack.write_all(&data.data).await {
                                 log::error!("[UdpGw] Ending {} <> {} with send_udp_packet {}", &tcp_local_addr, udp_dst, e);
                                 break;
                             }
